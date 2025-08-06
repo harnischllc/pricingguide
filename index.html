@@ -178,6 +178,21 @@
         margin-bottom: 1.5rem;
     }
 
+    .service-selection-note {
+        grid-column: 1 / -1;
+        background: var(--gray-50);
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius);
+        border-left: 4px solid var(--primary);
+        margin-bottom: 1rem;
+    }
+
+    .service-selection-note p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--gray-700);
+    }
+
     .service-item {
         background: white;
         border: 2px solid var(--gray-200);
@@ -214,6 +229,27 @@
         justify-content: center;
         font-size: 0.75rem;
         font-weight: bold;
+    }
+
+    /* Website options (mutually exclusive) */
+    .service-item[data-service="full-website"],
+    .service-item[data-service="landing-page"] {
+        border-width: 3px;
+        border-style: solid;
+    }
+
+    .service-item[data-service="full-website"]:hover,
+    .service-item[data-service="landing-page"]:hover {
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .service-item[data-service="full-website"].selected,
+    .service-item[data-service="landing-page"].selected {
+        border-color: var(--primary);
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        box-shadow: var(--shadow-md);
     }
 
     .service-header {
@@ -560,6 +596,9 @@
             <div class="service-options" id="serviceOptions">
                 <!-- Website Services -->
                 <div class="service-grid" id="website-services" style="display: none;">
+                    <div class="service-selection-note">
+                        <p><strong>Choose one website option:</strong></p>
+                    </div>
                     <div class="service-item" data-service="full-website" data-price="5000" data-type="one-time">
                         <div class="service-header">
                             <div class="service-name">Full Custom Website</div>
@@ -574,6 +613,38 @@
                             <div class="service-price">$1,500</div>
                         </div>
                         <div class="service-description">High-converting landing page with custom design and optimization</div>
+                    </div>
+                    <!-- Monthly Services (moved under Website Services) -->
+                    <div class="service-item" data-service="security-monitoring" data-price="200" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">Security Monitoring & Backups</div>
+                            <div class="service-price">$200/mo</div>
+                        </div>
+                        <div class="service-description">24/7 security monitoring, automated backups, and threat protection</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="unlimited-updates" data-price="200" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">Unlimited Updates</div>
+                            <div class="service-price">$200/mo</div>
+                        </div>
+                        <div class="service-description">Unlimited content updates, maintenance, and website modifications</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="seo-monitoring" data-price="100" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">SEO Monitoring</div>
+                            <div class="service-price">$100/mo</div>
+                        </div>
+                        <div class="service-description">Ongoing SEO optimization, keyword tracking, and performance monitoring</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="reputation-monitoring" data-price="100" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">Reputation Monitoring</div>
+                            <div class="service-price">$100/mo</div>
+                        </div>
+                        <div class="service-description">Online reputation management and review monitoring services</div>
                     </div>
                 </div>
 
@@ -666,40 +737,6 @@
                     </div>
                 </div>
 
-                <!-- Monthly Services -->
-                <div class="service-grid" id="monthly-services" style="display: none;">
-                    <div class="service-item" data-service="security-monitoring" data-price="200" data-type="monthly">
-                        <div class="service-header">
-                            <div class="service-name">Security Monitoring & Backups</div>
-                            <div class="service-price">$200/mo</div>
-                        </div>
-                        <div class="service-description">24/7 security monitoring, automated backups, and threat protection</div>
-                    </div>
-                    
-                    <div class="service-item" data-service="unlimited-updates" data-price="200" data-type="monthly">
-                        <div class="service-header">
-                            <div class="service-name">Unlimited Updates</div>
-                            <div class="service-price">$200/mo</div>
-                        </div>
-                        <div class="service-description">Unlimited content updates, maintenance, and website modifications</div>
-                    </div>
-                    
-                    <div class="service-item" data-service="seo-monitoring" data-price="100" data-type="monthly">
-                        <div class="service-header">
-                            <div class="service-name">SEO Monitoring</div>
-                            <div class="service-price">$100/mo</div>
-                        </div>
-                        <div class="service-description">Ongoing SEO optimization, keyword tracking, and performance monitoring</div>
-                    </div>
-                    
-                    <div class="service-item" data-service="reputation-monitoring" data-price="100" data-type="monthly">
-                        <div class="service-header">
-                            <div class="service-name">Reputation Monitoring</div>
-                            <div class="service-price">$100/mo</div>
-                        </div>
-                        <div class="service-description">Online reputation management and review monitoring services</div>
-                    </div>
-                </div>
 
                 <!-- Hourly Inputs -->
                 <div class="hourly-inputs" id="hourlyInputs">
@@ -832,6 +869,19 @@
         const serviceName = item.querySelector('.service-name').textContent;
         const price = parseFloat(item.dataset.price);
         const type = item.dataset.type;
+        
+        // Handle website services (mutually exclusive)
+        if (type === 'one-time' && (serviceId === 'full-website' || serviceId === 'landing-page')) {
+            // Deselect other website options first
+            const websiteServices = document.querySelectorAll('[data-service="full-website"], [data-service="landing-page"]');
+            websiteServices.forEach(service => {
+                if (service !== item) {
+                    service.classList.remove('selected');
+                    const otherServiceId = service.dataset.service;
+                    state.selectedServices.delete(otherServiceId);
+                }
+            });
+        }
         
         if (item.classList.contains('selected')) {
             // Deselect
