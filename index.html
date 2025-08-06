@@ -1390,13 +1390,29 @@
         state.smartEditingServices.forEach((service, serviceId) => {
             const total = service.price * service.hours;
             smartEditingTotal += total;
-            addBreakdownItem(`${service.name} (${service.hours} hr${service.hours > 1 ? 's' : ''})`, `$${total}`);
+            addBreakdownItem(`${service.name} (~${service.hours} hr${service.hours > 1 ? 's' : ''})`, `$${total}`);
         });
         
-        // Update totals
-        document.getElementById('oneTimeTotal').textContent = `$${oneTimeTotal.toFixed(0)}`;
-        document.getElementById('hourlyTotal').textContent = `$${hourlyTotal.toFixed(0)}`;
-        document.getElementById('monthlyTotal').textContent = `$${monthlyTotal.toFixed(0)}`;
+        // Update totals and show/hide categories
+        const oneTimeElement = document.getElementById('oneTimeTotal');
+        const hourlyElement = document.getElementById('hourlyTotal');
+        const monthlyElement = document.getElementById('monthlyTotal');
+        
+        // Show/hide one-time services line
+        const oneTimeLine = oneTimeElement.parentElement;
+        oneTimeLine.style.display = oneTimeTotal > 0 ? 'flex' : 'none';
+        oneTimeElement.textContent = `$${oneTimeTotal.toFixed(0)}`;
+        
+        // Show/hide hourly services line
+        const hourlyLine = hourlyElement.parentElement;
+        hourlyLine.style.display = hourlyTotal > 0 ? 'flex' : 'none';
+        hourlyElement.textContent = `$${hourlyTotal.toFixed(0)}`;
+        
+        // Show/hide monthly services line
+        const monthlyLine = monthlyElement.parentElement;
+        monthlyLine.style.display = monthlyTotal > 0 ? 'flex' : 'none';
+        monthlyElement.textContent = `$${monthlyTotal.toFixed(0)}`;
+        
         document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal + smartEditingTotal).toFixed(0)}`;
     }
 
