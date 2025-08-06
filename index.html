@@ -729,17 +729,17 @@
                     <div class="service-item editing-option" data-service="photo-editing" data-price="50" data-type="smart-editing" data-editing-type="photo" style="display: none;">
                         <div class="service-header">
                             <div class="service-name">Photo Editing</div>
-                            <div class="service-price">$50/hr (Auto-calculated)</div>
+                            <div class="service-price">$50/hr (Estimated)</div>
                         </div>
-                        <div class="service-description">Professional photo editing, color correction, and post-production. Hours calculated based on shooting time.</div>
+                        <div class="service-description">Professional photo editing, color correction, and post-production. Estimated hours based on shooting time.</div>
                     </div>
                     
                     <div class="service-item editing-option" data-service="video-editing" data-price="50" data-type="smart-editing" data-editing-type="video" style="display: none;">
                         <div class="service-header">
                             <div class="service-name">Video Editing</div>
-                            <div class="service-price">$50/hr (Auto-calculated)</div>
+                            <div class="service-price">$50/hr (Estimated)</div>
                         </div>
-                        <div class="service-description">Professional video editing and post-production. Hours calculated based on shooting time.</div>
+                        <div class="service-description">Professional video editing and post-production. Estimated hours based on shooting time.</div>
                     </div>
                     
                     <!-- Deliverable Options (shown conditionally) -->
@@ -781,9 +781,9 @@
                     <div class="service-item" data-service="video-audio-editing" data-price="75" data-type="smart-editing" data-editing-type="video">
                         <div class="service-header">
                             <div class="service-name">Video & Audio Editing</div>
-                            <div class="service-price">$75/hr (Auto-calculated)</div>
+                            <div class="service-price">$75/hr (Estimated)</div>
                         </div>
-                        <div class="service-description">Complete post-production editing with transcripts and optimization. Hours calculated based on recording time.</div>
+                        <div class="service-description">Complete post-production editing with transcripts and optimization. Estimated hours based on recording time.</div>
                     </div>
                     
                     <div class="service-item" data-service="audio-recording" data-price="75" data-type="hourly">
@@ -797,9 +797,9 @@
                     <div class="service-item" data-service="audio-editing" data-price="50" data-type="smart-editing" data-editing-type="audio">
                         <div class="service-header">
                             <div class="service-name">Audio Editing</div>
-                            <div class="service-price">$50/hr (Auto-calculated)</div>
+                            <div class="service-price">$50/hr (Estimated)</div>
                         </div>
-                        <div class="service-description">Audio editing, noise reduction, and podcast optimization. Hours calculated based on recording time.</div>
+                        <div class="service-description">Audio editing, noise reduction, and podcast optimization. Estimated hours based on recording time.</div>
                     </div>
                 </div>
 
@@ -1008,7 +1008,7 @@
             const serviceElement = document.querySelector(`[data-service="${serviceId}"]`);
             if (serviceElement) {
                 const priceElement = serviceElement.querySelector('.service-price');
-                priceElement.textContent = `$${service.price}/hr (${service.hours} hrs)`;
+                priceElement.textContent = `$${service.price}/hr (~${service.hours} hrs)`;
             }
         });
     }
