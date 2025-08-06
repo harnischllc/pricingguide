@@ -1,0 +1,1085 @@
+<!-- Eric Harnisch Service Pricing Calculator - WordPress/Elementor Version -->
+<!-- Copy this entire code block and paste it into an Elementor HTML widget -->
+
+<style>
+.pricing-calculator * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.pricing-calculator {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: #1f2937;
+    background: linear-gradient(135deg, #5d4fff 0%, #e2498a 100%);
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.pricing-calculator .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.pricing-calculator .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: white;
+}
+
+.pricing-calculator .header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pricing-calculator .header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* Main Calculator */
+.pricing-calculator .calculator {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    min-height: 600px;
+}
+
+/* Live Summary Bar */
+.pricing-calculator .live-summary {
+    background: #f9fafb;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #374151;
+}
+
+.pricing-calculator .live-summary .total {
+    font-size: 1.25rem;
+    color: #5d4fff;
+}
+
+/* Category Selection */
+.pricing-calculator .categories {
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.pricing-calculator .category-card {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.pricing-calculator .category-card:hover {
+    border-color: #5d4fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.pricing-calculator .category-card.selected {
+    border-color: #5d4fff;
+    background: #f9fafb;
+}
+
+.pricing-calculator .category-card i {
+    font-size: 2.5rem;
+    color: #5d4fff;
+    margin-bottom: 1rem;
+}
+
+.pricing-calculator .category-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.pricing-calculator .category-card p {
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+
+/* Service Options */
+.pricing-calculator .service-options {
+    padding: 1.5rem;
+    display: none;
+}
+
+.pricing-calculator .service-options.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.pricing-calculator .service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.pricing-calculator .service-item {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.pricing-calculator .service-item:hover {
+    border-color: #5d4fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.pricing-calculator .service-item.selected {
+    border-color: #5d4fff;
+    background: #f9fafb;
+}
+
+.pricing-calculator .service-item.selected::after {
+    content: '✓';
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    background: #10b981;
+    color: white;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Website options (mutually exclusive) */
+.pricing-calculator .service-item[data-service="full-website"],
+.pricing-calculator .service-item[data-service="landing-page"],
+.pricing-calculator .service-item[data-service="custom-solution"] {
+    border-width: 3px;
+    border-style: solid;
+}
+
+.pricing-calculator .service-item[data-service="full-website"]:hover,
+.pricing-calculator .service-item[data-service="landing-page"]:hover,
+.pricing-calculator .service-item[data-service="custom-solution"]:hover {
+    border-color: #5636d1;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.pricing-calculator .service-item[data-service="full-website"].selected,
+.pricing-calculator .service-item[data-service="landing-page"].selected,
+.pricing-calculator .service-item[data-service="custom-solution"].selected {
+    border-color: #5d4fff;
+    background: linear-gradient(135deg, #f9fafb 0%, white 100%);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.pricing-calculator .service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.pricing-calculator .service-name {
+    font-weight: 600;
+    color: #1f2937;
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.pricing-calculator .service-price {
+    font-weight: 700;
+    color: #5d4fff;
+    font-size: 1.1rem;
+}
+
+.pricing-calculator .service-description {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+
+.pricing-calculator .bells-whistles-header {
+    grid-column: 1 / -1;
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid #5d4fff;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.pricing-calculator .bells-whistles-header h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.pricing-calculator .bells-whistles-header p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+/* Hourly Inputs */
+.pricing-calculator .hourly-inputs {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+    display: none;
+}
+
+.pricing-calculator .hourly-inputs.active {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+.pricing-calculator .hourly-inputs h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.pricing-calculator .input-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+}
+
+.pricing-calculator .input-group {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    min-width: 180px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.pricing-calculator .input-group:hover {
+    border-color: #5d4fff;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.pricing-calculator .input-group label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.pricing-calculator .input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.pricing-calculator .input-group input:focus {
+    outline: none;
+    border-color: #5d4fff;
+    box-shadow: 0 0 0 3px rgba(93, 79, 255, 0.1);
+}
+
+/* Buttons */
+.pricing-calculator .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.pricing-calculator .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.pricing-calculator .btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.pricing-calculator .btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.pricing-calculator .btn-success {
+    background: #5d4fff;
+    color: white;
+}
+
+.pricing-calculator .btn-success:hover {
+    background: #5636d1;
+    transform: translateY(-1px);
+}
+
+.pricing-calculator .btn-primary {
+    background: #5d4fff;
+    color: white;
+}
+
+.pricing-calculator .btn-primary:hover {
+    background: #5636d1;
+}
+
+/* Quote Summary */
+.pricing-calculator .quote-summary {
+    padding: 2rem;
+    display: none;
+}
+
+.pricing-calculator .quote-summary h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #1f2937;
+}
+
+.pricing-calculator .service-breakdown {
+    margin-bottom: 2rem;
+}
+
+.pricing-calculator .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.pricing-calculator .breakdown-item:last-child {
+    border-bottom: none;
+}
+
+.pricing-calculator .breakdown-name {
+    font-weight: 500;
+    color: #374151;
+}
+
+.pricing-calculator .breakdown-price {
+    font-weight: 600;
+    color: #5d4fff;
+}
+
+.pricing-calculator .total-breakdown {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.pricing-calculator .total-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.pricing-calculator .total-line:last-child {
+    margin-bottom: 0;
+    border-top: 2px solid #e5e7eb;
+    padding-top: 0.75rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #5d4fff;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 500px; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .pricing-calculator .header h1 {
+        font-size: 2rem;
+    }
+    
+    .pricing-calculator .categories {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .pricing-calculator .service-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-calculator .actions {
+        flex-direction: column;
+    }
+    
+    .pricing-calculator .input-grid {
+        flex-direction: column;
+    }
+    
+    .pricing-calculator .input-group {
+        min-width: auto;
+    }
+}
+</style>
+
+<div class="pricing-calculator">
+    <div class="container">
+        <header class="header">
+            <h1>Service Pricing Calculator</h1>
+            <p>Get instant quotes for your project needs</p>
+        </header>
+        
+        <div class="calculator">
+            <div class="live-summary">
+                <div class="services-count">
+                    <span id="selectedCount">0</span> services selected
+                </div>
+                <div class="total">
+                    Estimated Total: <span id="liveTotal">$0</span>
+                </div>
+            </div>
+            
+            <!-- Category Selection -->
+            <div class="categories" id="categories">
+                <div class="category-card" data-category="website">
+                    <i class="fas fa-globe"></i>
+                    <h3>Website Services</h3>
+                    <p>Custom websites, landing pages, and web development</p>
+                </div>
+                
+                <div class="category-card" data-category="photography">
+                    <i class="fas fa-camera"></i>
+                    <h3>Photography Services</h3>
+                    <p>Professional photography and videography</p>
+                </div>
+                
+                <div class="category-card" data-category="podcast">
+                    <i class="fas fa-microphone"></i>
+                    <h3>Podcast Services</h3>
+                    <p>Planning sessions and strategy development</p>
+                </div>
+            </div>
+
+            <!-- Service Options -->
+            <div class="service-options" id="serviceOptions">
+                <!-- Website Services -->
+                <div class="service-grid" id="website-services" style="display: none;">
+                    <!-- Main Website Options -->
+                    <div class="service-item" data-service="full-website" data-price="5000" data-type="one-time">
+                        <div class="service-header">
+                            <div class="service-name">Full Custom Website</div>
+                            <div class="service-price">$5,000</div>
+                        </div>
+                        <div class="service-description">Complete website with up to 25 pages, custom design, and responsive layout</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="landing-page" data-price="1500" data-type="one-time">
+                        <div class="service-header">
+                            <div class="service-name">Single Landing Page</div>
+                            <div class="service-price">$1,500</div>
+                        </div>
+                        <div class="service-description">High-converting landing page with custom design and optimization</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="custom-solution" data-price="0" data-type="one-time">
+                        <div class="service-header">
+                            <div class="service-name">Custom Solution</div>
+                            <div class="service-price">Contact Us</div>
+                        </div>
+                        <div class="service-description">Custom solution for larger business or organization. <a href="https://calendly.com/harnischllc/zoom-meeting" target="_blank" style="color: #5d4fff; text-decoration: underline;">Schedule a time to discuss your vision</a></div>
+                    </div>
+                    
+                    <!-- Bells & Whistles Section -->
+                    <div class="bells-whistles-header">
+                        <h3>Bells & Whistles</h3>
+                        <p>Add some extra magic to your website</p>
+                    </div>
+                    
+                    <div class="service-item" data-service="security-monitoring" data-price="200" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">Security Monitoring & Backups</div>
+                            <div class="service-price">$200/mo</div>
+                        </div>
+                        <div class="service-description">24/7 security monitoring, automated backups, and threat protection</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="unlimited-updates" data-price="200" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">Unlimited Updates</div>
+                            <div class="service-price">$200/mo</div>
+                        </div>
+                        <div class="service-description">Unlimited content updates, maintenance, and website modifications</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="seo-monitoring" data-price="100" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">SEO Monitoring</div>
+                            <div class="service-price">$100/mo</div>
+                        </div>
+                        <div class="service-description">Ongoing SEO optimization, keyword tracking, and performance monitoring</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="reputation-monitoring" data-price="100" data-type="monthly">
+                        <div class="service-header">
+                            <div class="service-name">Reputation Monitoring</div>
+                            <div class="service-price">$100/mo</div>
+                        </div>
+                        <div class="service-description">Online reputation management and review monitoring services</div>
+                    </div>
+                </div>
+
+                <!-- Photography Services -->
+                <div class="service-grid" id="photography-services" style="display: none;">
+                    <div class="service-item" data-service="photography" data-price="100" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Photography</div>
+                            <div class="service-price">$100/hr</div>
+                        </div>
+                        <div class="service-description">Professional photography for events, portraits, real estate, and social media</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="videography" data-price="100" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Videography</div>
+                            <div class="service-price">$100/hr</div>
+                        </div>
+                        <div class="service-description">Professional video production for business, events, and social media</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="photo-video-combo" data-price="175" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Photo & Video Combo</div>
+                            <div class="service-price">$175/hr</div>
+                        </div>
+                        <div class="service-description">Combined photography and videography services for comprehensive coverage</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="editing" data-price="50" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Editing</div>
+                            <div class="service-price">$50/hr</div>
+                        </div>
+                        <div class="service-description">Professional photo and video editing, color correction, and post-production</div>
+                    </div>
+                </div>
+
+                <!-- Podcast Services -->
+                <div class="service-grid" id="podcast-services" style="display: none;">
+                    <div class="service-item" data-service="video-audio-recording" data-price="100" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Video & Audio Recording</div>
+                            <div class="service-price">$100/hr</div>
+                        </div>
+                        <div class="service-description">Professional recording setup for podcasts, interviews, and remote sessions</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="video-audio-editing" data-price="75" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Video & Audio Editing</div>
+                            <div class="service-price">$75/hr</div>
+                        </div>
+                        <div class="service-description">Professional editing for podcasts, videos, and audio content</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="audio-editing" data-price="50" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Audio Editing</div>
+                            <div class="service-price">$50/hr</div>
+                        </div>
+                        <div class="service-description">Professional audio editing, noise reduction, and post-production</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="podcast-strategy" data-price="150" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Podcast Strategy</div>
+                            <div class="service-price">$150/hr</div>
+                        </div>
+                        <div class="service-description">Strategic planning, content development, and growth consulting</div>
+                    </div>
+                </div>
+
+                <!-- Hourly Inputs -->
+                <div class="hourly-inputs" id="hourlyInputs">
+                    <h3>Service Hours</h3>
+                    <div class="input-grid" id="hourlyInputs">
+                        <!-- Hourly inputs will be dynamically added here -->
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="resetCalculator()">
+                        <i class="fas fa-redo"></i>
+                        Start Over
+                    </button>
+                    <button class="btn btn-success" onclick="getQuote()">
+                        <i class="fas fa-envelope"></i>
+                        Get Custom Quote
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quote Summary -->
+            <div class="quote-summary" id="quoteSummary" style="display: none;">
+                <h3>Your Custom Quote</h3>
+                
+                <div class="service-breakdown" id="serviceBreakdown">
+                    <!-- Service breakdown will be populated here -->
+                </div>
+
+                <div class="total-breakdown">
+                    <div class="total-line">
+                        <span>One-time Services:</span>
+                        <span id="oneTimeTotal">$0</span>
+                    </div>
+                    <div class="total-line">
+                        <span>Hourly Services:</span>
+                        <span id="hourlyTotal">$0</span>
+                    </div>
+                    <div class="total-line">
+                        <span>Monthly Services:</span>
+                        <span id="monthlyTotal">$0</span>
+                    </div>
+                    <div class="total-line total-final">
+                        <span>Estimated Total:</span>
+                        <span id="finalTotal">$0</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="backToServices()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Services
+                    </button>
+                    <button class="btn btn-primary" onclick="contactMe()">
+                        <i class="fas fa-envelope"></i>
+                        Send Quote Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Global state
+    const state = {
+        selectedCategory: null,
+        selectedServices: new Map(),
+        hourlyServices: new Map(),
+        currentView: 'categories' // 'categories', 'services', 'quote'
+    };
+
+    // Initialize calculator
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCalculator();
+    });
+
+    function initializeCalculator() {
+        // Category selection
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', handleCategorySelection);
+        });
+
+        // Service selection
+        document.querySelectorAll('.service-item').forEach(item => {
+            item.addEventListener('click', handleServiceSelection);
+        });
+
+        // Update live summary
+        updateLiveSummary();
+    }
+
+    function handleCategorySelection(event) {
+        const card = event.currentTarget;
+        const category = card.dataset.category;
+        
+        // Update UI
+        document.querySelectorAll('.category-card').forEach(c => {
+            c.classList.remove('selected');
+        });
+        card.classList.add('selected');
+        
+        // Update state
+        state.selectedCategory = category;
+        
+        // Show services
+        showServices(category);
+        
+        // Update view
+        state.currentView = 'services';
+        updateLiveSummary();
+    }
+
+    function showServices(category) {
+        // Hide all service grids
+        document.querySelectorAll('.service-grid').forEach(grid => {
+            grid.style.display = 'none';
+        });
+        
+        // Show selected category services
+        const servicesGrid = document.getElementById(`${category}-services`);
+        if (servicesGrid) {
+            servicesGrid.style.display = 'grid';
+        }
+        
+        // Show service options container
+        document.getElementById('serviceOptions').classList.add('active');
+    }
+
+    function handleServiceSelection(event) {
+        const item = event.currentTarget;
+        const serviceId = item.dataset.service;
+        const serviceName = item.querySelector('.service-name').textContent;
+        const price = parseFloat(item.dataset.price);
+        const type = item.dataset.type;
+        
+        // Handle website services (mutually exclusive)
+        if (type === 'one-time' && (serviceId === 'full-website' || serviceId === 'landing-page' || serviceId === 'custom-solution')) {
+            // Deselect other website options first
+            const websiteServices = document.querySelectorAll('[data-service="full-website"], [data-service="landing-page"], [data-service="custom-solution"]');
+            websiteServices.forEach(service => {
+                if (service !== item) {
+                    service.classList.remove('selected');
+                    const otherServiceId = service.dataset.service;
+                    state.selectedServices.delete(otherServiceId);
+                }
+            });
+        }
+        
+        if (item.classList.contains('selected')) {
+            // Deselect
+            item.classList.remove('selected');
+            if (type === 'hourly') {
+                state.hourlyServices.delete(serviceId);
+                removeHourlyInput(serviceId);
+            } else {
+                state.selectedServices.delete(serviceId);
+            }
+        } else {
+            // Select
+            item.classList.add('selected');
+            if (type === 'hourly') {
+                state.hourlyServices.set(serviceId, {
+                    name: serviceName,
+                    price: price,
+                    hours: 1
+                });
+                addHourlyInput(serviceId, serviceName, price);
+            } else {
+                state.selectedServices.set(serviceId, {
+                    name: serviceName,
+                    price: price,
+                    type: type
+                });
+            }
+        }
+        
+        updateLiveSummary();
+    }
+
+    function addHourlyInput(serviceId, serviceName, price) {
+        const container = document.getElementById('hourlyInputs');
+        
+        // Check if input already exists
+        if (document.getElementById(`hourly-${serviceId}`)) {
+            return;
+        }
+        
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group';
+        inputGroup.id = `hourly-${serviceId}`;
+        
+        inputGroup.innerHTML = `
+            <label style="font-weight: 500; color: #374151; min-width: 120px;">${serviceName}</label>
+            <input type="number" min="1" value="1" data-service="${serviceId}" data-price="${price}" style="width: 60px; text-align: center; border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.25rem;">
+            <span style="color: #6b7280; font-size: 0.875rem;">hrs</span>
+            <div class="total" style="margin-left: auto; font-weight: 600; color: #5d4fff;">$${price}</div>
+        `;
+        
+        const input = inputGroup.querySelector('input');
+        input.addEventListener('input', updateHourlyTotal);
+        
+        container.appendChild(inputGroup);
+        container.classList.add('active');
+    }
+
+    function removeHourlyInput(serviceId) {
+        const inputElement = document.getElementById(`hourly-${serviceId}`);
+        if (inputElement) {
+            inputElement.remove();
+        }
+        
+        // Hide hourly inputs if no hourly services
+        if (state.hourlyServices.size === 0) {
+            document.getElementById('hourlyInputs').classList.remove('active');
+        }
+    }
+
+    function updateHourlyTotal(event) {
+        const input = event.target;
+        const serviceId = input.dataset.service;
+        const price = parseFloat(input.dataset.price);
+        const hours = parseFloat(input.value) || 0;
+        const total = price * hours;
+        
+        // Update display
+        const totalElement = input.parentElement.querySelector('.total');
+        totalElement.textContent = `$${total.toFixed(0)}`;
+        
+        // Update state
+        if (state.hourlyServices.has(serviceId)) {
+            state.hourlyServices.get(serviceId).hours = hours;
+        }
+        
+        updateLiveSummary();
+    }
+
+    function updateLiveSummary() {
+        const selectedCount = state.selectedServices.size + state.hourlyServices.size;
+        const total = calculateTotal();
+        
+        document.getElementById('selectedCount').textContent = selectedCount;
+        document.getElementById('liveTotal').textContent = `$${total.toFixed(0)}`;
+        
+        // Update button text based on custom solution selection
+        updateQuoteButton();
+    }
+
+    function updateQuoteButton() {
+        const quoteButton = document.querySelector('.btn-success');
+        const hasCustomSolution = state.selectedServices.has('custom-solution');
+        
+        if (hasCustomSolution) {
+            quoteButton.innerHTML = '<i class="fas fa-calendar"></i> Schedule Consultation';
+        } else {
+            quoteButton.innerHTML = '<i class="fas fa-envelope"></i> Get Custom Quote';
+        }
+    }
+
+    function calculateTotal() {
+        let oneTimeTotal = 0;
+        let hourlyTotal = 0;
+        let monthlyTotal = 0;
+        
+        state.selectedServices.forEach((service, serviceId) => {
+            if (service.type === 'monthly') {
+                monthlyTotal += service.price;
+            } else if (serviceId === 'custom-solution') {
+                // Custom solution doesn't add to total
+            } else {
+                oneTimeTotal += service.price;
+            }
+        });
+        
+        state.hourlyServices.forEach((service, serviceId) => {
+            hourlyTotal += service.price * service.hours;
+        });
+        
+        return oneTimeTotal + hourlyTotal + monthlyTotal;
+    }
+
+    function getQuote() {
+        if (state.selectedServices.size === 0 && state.hourlyServices.size === 0) {
+            alert('Please select at least one service to get a quote.');
+            return;
+        }
+        
+        // Check if custom solution is selected
+        const hasCustomSolution = state.selectedServices.has('custom-solution');
+        
+        if (hasCustomSolution) {
+            // Redirect to Calendly for custom solution
+            window.open('https://calendly.com/harnischllc/zoom-meeting', '_blank');
+            return;
+        }
+        
+        // Hide service options
+        document.getElementById('serviceOptions').classList.remove('active');
+        
+        // Show quote summary
+        document.getElementById('quoteSummary').style.display = 'block';
+        
+        // Populate breakdown
+        populateQuoteBreakdown();
+        
+        state.currentView = 'quote';
+    }
+
+    function populateQuoteBreakdown() {
+        const breakdown = document.getElementById('serviceBreakdown');
+        breakdown.innerHTML = '';
+        
+        let oneTimeTotal = 0;
+        let hourlyTotal = 0;
+        let monthlyTotal = 0;
+        
+        // One-time services
+        state.selectedServices.forEach((service, serviceId) => {
+            if (service.type === 'one-time') {
+                if (serviceId === 'custom-solution') {
+                    addBreakdownItem(service.name, 'Contact for pricing');
+                } else {
+                    oneTimeTotal += service.price;
+                    addBreakdownItem(service.name, `$${service.price}`);
+                }
+            } else if (service.type === 'monthly') {
+                monthlyTotal += service.price;
+                addBreakdownItem(service.name, `$${service.price}/mo`);
+            }
+        });
+        
+        // Hourly services
+        state.hourlyServices.forEach((service, serviceId) => {
+            const total = service.price * service.hours;
+            hourlyTotal += total;
+            addBreakdownItem(`${service.name} (${service.hours} hr${service.hours > 1 ? 's' : ''})`, `$${total}`);
+        });
+        
+        // Update totals
+        document.getElementById('oneTimeTotal').textContent = `$${oneTimeTotal.toFixed(0)}`;
+        document.getElementById('hourlyTotal').textContent = `$${hourlyTotal.toFixed(0)}`;
+        document.getElementById('monthlyTotal').textContent = `$${monthlyTotal.toFixed(0)}`;
+        document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal).toFixed(0)}`;
+    }
+
+    function addBreakdownItem(name, price) {
+        const breakdown = document.getElementById('serviceBreakdown');
+        const item = document.createElement('div');
+        item.className = 'breakdown-item';
+        item.innerHTML = `
+            <span class="breakdown-name">${name}</span>
+            <span class="breakdown-price">${price}</span>
+        `;
+        breakdown.appendChild(item);
+    }
+
+    function backToServices() {
+        document.getElementById('quoteSummary').style.display = 'none';
+        document.getElementById('serviceOptions').classList.add('active');
+        state.currentView = 'services';
+    }
+
+    function resetCalculator() {
+        // Reset state
+        state.selectedCategory = null;
+        state.selectedServices.clear();
+        state.hourlyServices.clear();
+        state.currentView = 'categories';
+        
+        // Reset UI
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        document.querySelectorAll('.service-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Hide all service grids
+        document.querySelectorAll('.service-grid').forEach(grid => {
+            grid.style.display = 'none';
+        });
+        
+        // Clear hourly inputs
+        document.getElementById('hourlyInputs').innerHTML = '';
+        document.getElementById('hourlyInputs').classList.remove('active');
+        
+        // Hide service options and quote summary
+        document.getElementById('serviceOptions').classList.remove('active');
+        document.getElementById('quoteSummary').style.display = 'none';
+        
+        updateLiveSummary();
+    }
+
+    function contactMe() {
+        let summary = 'Selected Services:\n\n';
+        
+        let oneTimeServices = [];
+        let monthlyServices = [];
+        
+        state.selectedServices.forEach((service, serviceId) => {
+            if (service.type === 'monthly') {
+                monthlyServices.push(`${service.name} - $${service.price}/mo`);
+            } else if (serviceId === 'custom-solution') {
+                oneTimeServices.push(`${service.name} - Contact for pricing`);
+            } else {
+                oneTimeServices.push(`${service.name} - $${service.price}`);
+            }
+        });
+        
+        if (oneTimeServices.length > 0) {
+            summary += 'One-time Services:\n';
+            summary += oneTimeServices.join('\n') + '\n\n';
+        }
+        
+        if (state.hourlyServices.size > 0) {
+            summary += 'Hourly Services:\n';
+            state.hourlyServices.forEach((service, serviceId) => {
+                const total = service.price * service.hours;
+                summary += `${service.name} - ${service.hours} hour(s) - $${total}\n`;
+            });
+            summary += '\n';
+        }
+        
+        if (monthlyServices.length > 0) {
+            summary += 'Monthly Services:\n';
+            summary += monthlyServices.join('\n') + '\n\n';
+        }
+        
+        const finalTotal = calculateTotal();
+        summary += `\nEstimated Total: $${finalTotal.toFixed(0)}`;
+        
+        const subject = encodeURIComponent('Custom Quote Request - Eric Harnisch Services');
+        const body = encodeURIComponent(summary);
+        const mailtoLink = `mailto:contact@ericharnisch.com?subject=${subject}&body=${body}`;
+        
+        window.open(mailtoLink);
+    }
+    </script>
+</div> 
