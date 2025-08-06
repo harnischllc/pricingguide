@@ -1479,7 +1479,9 @@
         
         // Show/hide one-time services line
         const oneTimeLine = oneTimeElement.parentElement;
-        oneTimeLine.style.display = oneTimeTotal > 0 ? 'flex' : 'none';
+        // Hide one-time services if we're showing initial build instead
+        const shouldShowOneTime = oneTimeTotal > 0 && !(hasWebsiteServices && hasMonthlyServices);
+        oneTimeLine.style.display = shouldShowOneTime ? 'flex' : 'none';
         oneTimeElement.textContent = `$${oneTimeTotal.toFixed(0)}`;
         
         // Show/hide hourly services line
@@ -1499,7 +1501,6 @@
         if (hasWebsiteServices && hasMonthlyServices) {
             // Show initial build and yearly maintenance
             const websitePrice = state.selectedServices.get('full-website')?.price || state.selectedServices.get('landing-page')?.price || 0;
-            const yearlyMaintenance = monthlyTotal * 12;
             
             // Update the final total display
             const finalTotalElement = document.getElementById('finalTotal');
