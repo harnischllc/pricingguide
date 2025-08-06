@@ -778,34 +778,42 @@
                 <div class="service-grid" id="podcast-services" style="display: none;">
                     <div class="service-item" data-service="video-audio-recording" data-price="100" data-type="hourly">
                         <div class="service-header">
-                            <div class="service-name">Video & Audio Recording</div>
+                            <div class="service-name">Video and/or Audio Recording</div>
                             <div class="service-price">$100/hr</div>
                         </div>
                         <div class="service-description">Professional recording setup for podcasts, interviews, and remote sessions</div>
                     </div>
                     
-                    <div class="service-item" data-service="video-audio-editing" data-price="75" data-type="smart-editing" data-editing-type="video">
+                    <div class="service-item" data-service="video-podcast-editing" data-price="75" data-type="smart-editing" data-editing-type="video">
                         <div class="service-header">
-                            <div class="service-name">Video & Audio Editing</div>
+                            <div class="service-name">Video Podcast Editing</div>
                             <div class="service-price">$75/hr (Estimated)</div>
                         </div>
                         <div class="service-description">Complete post-production editing with transcripts and optimization. Estimated hours based on recording time.</div>
                     </div>
                     
-                    <div class="service-item" data-service="audio-recording" data-price="75" data-type="hourly">
+                    <div class="service-item" data-service="audio-only-editing" data-price="50" data-type="smart-editing" data-editing-type="audio">
                         <div class="service-header">
-                            <div class="service-name">Audio Recording</div>
-                            <div class="service-price">$75/hr</div>
-                        </div>
-                        <div class="service-description">Audio-only recording for podcasts and voice content</div>
-                    </div>
-                    
-                    <div class="service-item" data-service="audio-editing" data-price="50" data-type="smart-editing" data-editing-type="audio">
-                        <div class="service-header">
-                            <div class="service-name">Audio Editing</div>
+                            <div class="service-name">Audio Only Podcast Editing</div>
                             <div class="service-price">$50/hr (Estimated)</div>
                         </div>
                         <div class="service-description">Audio editing, noise reduction, and podcast optimization. Estimated hours based on recording time.</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="transcript-subtitles" data-price="1.5" data-type="per-minute">
+                        <div class="service-header">
+                            <div class="service-name">Text Transcript & Subtitles</div>
+                            <div class="service-price">$1.50/min</div>
+                        </div>
+                        <div class="service-description">Professional transcription and subtitle creation for your audio/video content</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="podcast-strategy" data-price="150" data-type="hourly">
+                        <div class="service-header">
+                            <div class="service-name">Podcast Strategy & Consultation</div>
+                            <div class="service-price">$150/hr</div>
+                        </div>
+                        <div class="service-description">Strategic planning, content development, and growth consulting for your podcast</div>
                     </div>
                 </div>
 
@@ -843,7 +851,7 @@
                             <div class="service-name">Monthly Planning Session</div>
                             <div class="service-price">$150</div>
                         </div>
-                        <div class="service-description">1-hour monthly strategy session with content planning and goal setting</div>
+                        <div class="service-description">1-hour monthly strategy session for your media, marketing, creativity, video, photo, and podcast needs</div>
                     </div>
                     
                     <div class="service-item" data-service="quarterly-strategy" data-price="500" data-type="one-time">
@@ -851,7 +859,7 @@
                             <div class="service-name">Quarterly Strategy Planning</div>
                             <div class="service-price">$500</div>
                         </div>
-                        <div class="service-description">2.5-hour comprehensive quarterly strategy session with detailed planning</div>
+                        <div class="service-description">2.5-hour comprehensive quarterly strategy session for your media, marketing, creativity, video, photo, and podcast needs</div>
                     </div>
                 </div>
 
@@ -1184,6 +1192,19 @@
             });
         }
         
+        // Handle consultation services (mutually exclusive)
+        if (type === 'one-time' && (serviceId === 'monthly-planning' || serviceId === 'quarterly-strategy')) {
+            // Deselect other consultation options first
+            const consultationServices = document.querySelectorAll('[data-service="monthly-planning"], [data-service="quarterly-strategy"]');
+            consultationServices.forEach(service => {
+                if (service !== item) {
+                    service.classList.remove('selected');
+                    const otherServiceId = service.dataset.service;
+                    state.selectedServices.delete(otherServiceId);
+                }
+            });
+        }
+        
         // Handle shooting services (mutually exclusive)
         if (type === 'hourly' && (serviceId === 'photography' || serviceId === 'videography' || serviceId === 'photo-video-combo')) {
             // Deselect other shooting options first
@@ -1219,6 +1240,14 @@
                     hours: 1
                 });
                 addHourlyInput(serviceId, serviceName, price);
+            } else if (type === 'per-minute') {
+                state.hourlyServices.set(serviceId, {
+                    name: serviceName,
+                    price: price,
+                    hours: 1,
+                    perMinute: true
+                });
+                addHourlyInput(serviceId, serviceName, price, 'minutes');
             } else if (type === 'smart-editing') {
                 // Smart editing services are calculated automatically
                 state.smartEditingServices.set(serviceId, {
@@ -1259,7 +1288,7 @@
         updateLiveSummary();
     }
 
-    function addHourlyInput(serviceId, serviceName, price) {
+    function addHourlyInput(serviceId, serviceName, price, unit = 'hrs') {
         const container = document.getElementById('hourlyInputs');
         
         // Check if input already exists
@@ -1273,8 +1302,8 @@
         
         inputGroup.innerHTML = `
             <label style="font-weight: 500; color: var(--gray-700); min-width: 120px;">${serviceName}</label>
-            <input type="number" min="1" value="1" data-service="${serviceId}" data-price="${price}" style="width: 60px; text-align: center; border: 1px solid var(--gray-300); border-radius: var(--radius); padding: 0.25rem;">
-            <span style="color: var(--gray-500); font-size: 0.875rem;">hrs</span>
+            <input type="number" min="1" value="1" data-service="${serviceId}" data-price="${price}" data-unit="${unit}" style="width: 60px; text-align: center; border: 1px solid var(--gray-300); border-radius: var(--radius); padding: 0.25rem;">
+            <span style="color: var(--gray-500); font-size: 0.875rem;">${unit}</span>
             <div class="total" style="margin-left: auto; font-weight: 600; color: var(--primary);">$${price}</div>
         `;
         
@@ -1301,8 +1330,9 @@
         const input = event.target;
         const serviceId = input.dataset.service;
         const price = parseFloat(input.dataset.price);
-        const hours = parseFloat(input.value) || 0;
-        const total = price * hours;
+        const quantity = parseFloat(input.value) || 0;
+        const unit = input.dataset.unit || 'hrs';
+        const total = price * quantity;
         
         // Update display
         const totalElement = input.parentElement.querySelector('.total');
@@ -1310,7 +1340,9 @@
         
         // Update state
         if (state.hourlyServices.has(serviceId)) {
-            state.hourlyServices.get(serviceId).hours = hours;
+            const service = state.hourlyServices.get(serviceId);
+            service.hours = quantity;
+            service.unit = unit;
         }
         
         // Update smart editing estimates when shooting/recording hours change
@@ -1428,7 +1460,9 @@
         state.hourlyServices.forEach((service, serviceId) => {
             const total = service.price * service.hours;
             hourlyTotal += total;
-            addBreakdownItem(`${service.name} (${service.hours} hr${service.hours > 1 ? 's' : ''})`, `$${total}`);
+            const unit = service.unit || 'hr';
+            const unitText = service.hours > 1 ? (unit === 'hr' ? 'hrs' : unit + 's') : unit;
+            addBreakdownItem(`${service.name} (${service.hours} ${unitText})`, `$${total}`);
         });
         
         // Smart editing services
@@ -1458,7 +1492,34 @@
         monthlyLine.style.display = monthlyTotal > 0 ? 'flex' : 'none';
         monthlyElement.textContent = `$${monthlyTotal.toFixed(0)}`;
         
-        document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal + smartEditingTotal).toFixed(0)}`;
+        // Special handling for website services with monthly charges
+        const hasWebsiteServices = state.selectedServices.has('full-website') || state.selectedServices.has('landing-page');
+        const hasMonthlyServices = monthlyTotal > 0;
+        
+        if (hasWebsiteServices && hasMonthlyServices) {
+            // Show initial build and yearly maintenance
+            const websitePrice = state.selectedServices.get('full-website')?.price || state.selectedServices.get('landing-page')?.price || 0;
+            const yearlyMaintenance = monthlyTotal * 12;
+            
+            // Update the final total display
+            const finalTotalElement = document.getElementById('finalTotal');
+            finalTotalElement.parentElement.innerHTML = `
+                <span>Initial Build:</span>
+                <span>$${websitePrice.toFixed(0)}</span>
+            `;
+            
+            // Add yearly maintenance line
+            const totalBreakdown = document.querySelector('.total-breakdown');
+            const yearlyLine = document.createElement('div');
+            yearlyLine.className = 'total-line total-final';
+            yearlyLine.innerHTML = `
+                <span>Year of Maintenance:</span>
+                <span>$${monthlyTotal}/mo</span>
+            `;
+            totalBreakdown.appendChild(yearlyLine);
+        } else {
+            document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal + smartEditingTotal).toFixed(0)}`;
+        }
     }
 
     function addBreakdownItem(name, price) {
