@@ -724,12 +724,36 @@
                         <div class="service-description">Combined photography and videography services for comprehensive coverage</div>
                     </div>
                     
-                    <div class="service-item" data-service="editing" data-price="50" data-type="hourly">
+                    <div class="service-item" data-service="photo-editing" data-price="50" data-type="smart-editing" data-editing-type="photo">
                         <div class="service-header">
-                            <div class="service-name">Editing</div>
-                            <div class="service-price">$50/hr</div>
+                            <div class="service-name">Photo Editing</div>
+                            <div class="service-price">$50/hr (Auto-calculated)</div>
                         </div>
-                        <div class="service-description">Professional photo and video editing, color correction, and post-production</div>
+                        <div class="service-description">Professional photo editing, color correction, and post-production. Hours calculated based on shooting time.</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="video-editing" data-price="50" data-type="smart-editing" data-editing-type="video">
+                        <div class="service-header">
+                            <div class="service-name">Video Editing</div>
+                            <div class="service-price">$50/hr (Auto-calculated)</div>
+                        </div>
+                        <div class="service-description">Professional video editing and post-production. Hours calculated based on shooting time.</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="raw-files" data-price="0" data-type="deliverable">
+                        <div class="service-header">
+                            <div class="service-name">RAW Files</div>
+                            <div class="service-price">Included</div>
+                        </div>
+                        <div class="service-description">Unprocessed image files requiring post-processing. Best for professional editing.</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="jpeg-files" data-price="0" data-type="deliverable">
+                        <div class="service-header">
+                            <div class="service-name">JPEG Files</div>
+                            <div class="service-price">Included</div>
+                        </div>
+                        <div class="service-description">Processed, ready-to-use images. Perfect for immediate use and sharing.</div>
                     </div>
                 </div>
 
@@ -743,12 +767,12 @@
                         <div class="service-description">Professional recording setup for podcasts, interviews, and remote sessions</div>
                     </div>
                     
-                    <div class="service-item" data-service="video-audio-editing" data-price="75" data-type="hourly">
+                    <div class="service-item" data-service="video-audio-editing" data-price="75" data-type="smart-editing" data-editing-type="video">
                         <div class="service-header">
                             <div class="service-name">Video & Audio Editing</div>
-                            <div class="service-price">$75/hr</div>
+                            <div class="service-price">$75/hr (Auto-calculated)</div>
                         </div>
-                        <div class="service-description">Complete post-production editing with transcripts and optimization</div>
+                        <div class="service-description">Complete post-production editing with transcripts and optimization. Hours calculated based on recording time.</div>
                     </div>
                     
                     <div class="service-item" data-service="audio-recording" data-price="75" data-type="hourly">
@@ -759,12 +783,12 @@
                         <div class="service-description">Audio-only recording for podcasts and voice content</div>
                     </div>
                     
-                    <div class="service-item" data-service="audio-editing" data-price="50" data-type="hourly">
+                    <div class="service-item" data-service="audio-editing" data-price="50" data-type="smart-editing" data-editing-type="audio">
                         <div class="service-header">
                             <div class="service-name">Audio Editing</div>
-                            <div class="service-price">$50/hr</div>
+                            <div class="service-price">$50/hr (Auto-calculated)</div>
                         </div>
-                        <div class="service-description">Audio editing, noise reduction, and podcast optimization</div>
+                        <div class="service-description">Audio editing, noise reduction, and podcast optimization. Hours calculated based on recording time.</div>
                     </div>
                 </div>
 
@@ -853,8 +877,149 @@
         selectedCategory: null,
         selectedServices: new Map(),
         hourlyServices: new Map(),
+        smartEditingServices: new Map(),
         currentView: 'categories' // 'categories', 'services', 'quote'
     };
+
+    // Smart editing calculation functions
+    function calculatePhotoEditingHours(shootingHours) {
+        const scale = {
+            1: 1,
+            2: 2,
+            3: 2.5,
+            4: 3,
+            5: 3.5
+        };
+        
+        if (shootingHours <= 5) {
+            return scale[shootingHours];
+        } else {
+            // For hours > 5, use 3.5 + (shootingHours - 5) * 0.5
+            return 3.5 + (shootingHours - 5) * 0.5;
+        }
+    }
+
+    function calculateVideoEditingHours(shootingHours) {
+        const scale = {
+            1: 2,
+            2: 3,
+            3: 4,
+            4: 6
+        };
+        
+        if (shootingHours <= 4) {
+            return scale[shootingHours];
+        } else {
+            // For hours > 4, use 6 + (shootingHours - 4) * 1.5
+            return 6 + (shootingHours - 4) * 1.5;
+        }
+    }
+
+    function calculateAudioEditingHours(recordingHours) {
+        // Audio editing uses the same scale as photo editing
+        return calculatePhotoEditingHours(recordingHours);
+    }
+
+    function updateSmartEditingEstimates() {
+        // Clear existing smart editing services
+        state.smartEditingServices.clear();
+        
+        // Check for photography services and calculate photo editing
+        const photographyHours = state.hourlyServices.get('photography')?.hours || 0;
+        const videographyHours = state.hourlyServices.get('videography')?.hours || 0;
+        const photoVideoComboHours = state.hourlyServices.get('photo-video-combo')?.hours || 0;
+        
+        // Check for podcast services
+        const audioRecordingHours = state.hourlyServices.get('audio-recording')?.hours || 0;
+        const videoAudioRecordingHours = state.hourlyServices.get('video-audio-recording')?.hours || 0;
+        
+        // Calculate photo editing if photography is selected
+        if (photographyHours > 0 || photoVideoComboHours > 0) {
+            const totalPhotoHours = photographyHours + photoVideoComboHours;
+            if (totalPhotoHours > 0) {
+                const editingHours = calculatePhotoEditingHours(totalPhotoHours);
+                state.smartEditingServices.set('photo-editing', {
+                    name: 'Photo Editing',
+                    price: 50,
+                    hours: editingHours,
+                    type: 'smart-editing',
+                    editingType: 'photo'
+                });
+            }
+        }
+        
+        // Calculate video editing if videography is selected
+        if (videographyHours > 0 || photoVideoComboHours > 0 || videoAudioRecordingHours > 0) {
+            const totalVideoHours = videographyHours + photoVideoComboHours + videoAudioRecordingHours;
+            if (totalVideoHours > 0) {
+                const editingHours = calculateVideoEditingHours(totalVideoHours);
+                state.smartEditingServices.set('video-editing', {
+                    name: 'Video Editing',
+                    price: 50,
+                    hours: editingHours,
+                    type: 'smart-editing',
+                    editingType: 'video'
+                });
+            }
+        }
+        
+        // Calculate audio editing if audio recording is selected
+        if (audioRecordingHours > 0) {
+            const editingHours = calculateAudioEditingHours(audioRecordingHours);
+            state.smartEditingServices.set('audio-editing', {
+                name: 'Audio Editing',
+                price: 50,
+                hours: editingHours,
+                type: 'smart-editing',
+                editingType: 'audio'
+            });
+        }
+        
+        // Update UI to show smart editing estimates
+        updateSmartEditingUI();
+        
+        // Update smart editing services in state if they're selected
+        state.smartEditingServices.forEach((service, serviceId) => {
+            const serviceElement = document.querySelector(`[data-service="${serviceId}"]`);
+            if (serviceElement && serviceElement.classList.contains('selected')) {
+                // Update the service with calculated hours
+                service.hours = state.smartEditingServices.get(serviceId).hours;
+            }
+        });
+    }
+
+    function updateSmartEditingUI() {
+        // Update the smart editing service items to show calculated hours
+        state.smartEditingServices.forEach((service, serviceId) => {
+            const serviceElement = document.querySelector(`[data-service="${serviceId}"]`);
+            if (serviceElement) {
+                const priceElement = serviceElement.querySelector('.service-price');
+                priceElement.textContent = `$${service.price}/hr (${service.hours} hrs)`;
+            }
+        });
+    }
+
+    function handleDeliverableSelection(selectedDeliverable) {
+        // Deselect other deliverable options
+        const deliverableServices = document.querySelectorAll('[data-service="raw-files"], [data-service="jpeg-files"]');
+        deliverableServices.forEach(service => {
+            service.classList.remove('selected');
+            state.selectedServices.delete(service.dataset.service);
+        });
+        
+        // Select the chosen deliverable
+        const selectedElement = document.querySelector(`[data-service="${selectedDeliverable}"]`);
+        if (selectedElement) {
+            selectedElement.classList.add('selected');
+            state.selectedServices.set(selectedDeliverable, {
+                name: selectedElement.querySelector('.service-name').textContent,
+                price: 0,
+                type: 'deliverable'
+            });
+        }
+        
+        updateLiveSummary();
+    }
 
     // Initialize calculator
     document.addEventListener('DOMContentLoaded', function() {
@@ -939,6 +1104,8 @@
             if (type === 'hourly') {
                 state.hourlyServices.delete(serviceId);
                 removeHourlyInput(serviceId);
+            } else if (type === 'smart-editing') {
+                state.smartEditingServices.delete(serviceId);
             } else {
                 state.selectedServices.delete(serviceId);
             }
@@ -952,6 +1119,19 @@
                     hours: 1
                 });
                 addHourlyInput(serviceId, serviceName, price);
+            } else if (type === 'smart-editing') {
+                // Smart editing services are calculated automatically
+                state.smartEditingServices.set(serviceId, {
+                    name: serviceName,
+                    price: price,
+                    hours: 0, // Will be calculated
+                    type: type,
+                    editingType: item.dataset.editingType
+                });
+            } else if (type === 'deliverable') {
+                // Handle deliverable selection (RAW vs JPEG)
+                handleDeliverableSelection(serviceId);
+                return; // Don't continue with normal selection logic
             } else {
                 state.selectedServices.set(serviceId, {
                     name: serviceName,
@@ -1018,11 +1198,14 @@
             state.hourlyServices.get(serviceId).hours = hours;
         }
         
+        // Update smart editing estimates when shooting/recording hours change
+        updateSmartEditingEstimates();
+        
         updateLiveSummary();
     }
 
     function updateLiveSummary() {
-        const selectedCount = state.selectedServices.size + state.hourlyServices.size;
+        const selectedCount = state.selectedServices.size + state.hourlyServices.size + state.smartEditingServices.size;
         const total = calculateTotal();
         
         document.getElementById('selectedCount').textContent = selectedCount;
@@ -1047,6 +1230,7 @@
         let oneTimeTotal = 0;
         let hourlyTotal = 0;
         let monthlyTotal = 0;
+        let smartEditingTotal = 0;
         
         state.selectedServices.forEach((service, serviceId) => {
             if (service.type === 'monthly') {
@@ -1062,11 +1246,17 @@
             hourlyTotal += service.price * service.hours;
         });
         
-        return oneTimeTotal + hourlyTotal + monthlyTotal;
+        // Smart editing services
+        state.smartEditingServices.forEach((service, serviceId) => {
+            const total = service.price * service.hours;
+            smartEditingTotal += total;
+        });
+        
+        return oneTimeTotal + hourlyTotal + monthlyTotal + smartEditingTotal;
     }
 
     function getQuote() {
-        if (state.selectedServices.size === 0 && state.hourlyServices.size === 0) {
+        if (state.selectedServices.size === 0 && state.hourlyServices.size === 0 && state.smartEditingServices.size === 0) {
             alert('Please select at least one service to get a quote.');
             return;
         }
@@ -1099,6 +1289,7 @@
         let oneTimeTotal = 0;
         let hourlyTotal = 0;
         let monthlyTotal = 0;
+        let smartEditingTotal = 0;
         
         // One-time services
         state.selectedServices.forEach((service, serviceId) => {
@@ -1122,11 +1313,18 @@
             addBreakdownItem(`${service.name} (${service.hours} hr${service.hours > 1 ? 's' : ''})`, `$${total}`);
         });
         
+        // Smart editing services
+        state.smartEditingServices.forEach((service, serviceId) => {
+            const total = service.price * service.hours;
+            smartEditingTotal += total;
+            addBreakdownItem(`${service.name} (${service.hours} hr${service.hours > 1 ? 's' : ''})`, `$${total}`);
+        });
+        
         // Update totals
         document.getElementById('oneTimeTotal').textContent = `$${oneTimeTotal.toFixed(0)}`;
         document.getElementById('hourlyTotal').textContent = `$${hourlyTotal.toFixed(0)}`;
         document.getElementById('monthlyTotal').textContent = `$${monthlyTotal.toFixed(0)}`;
-        document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal).toFixed(0)}`;
+        document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal + smartEditingTotal).toFixed(0)}`;
     }
 
     function addBreakdownItem(name, price) {
@@ -1151,6 +1349,7 @@
         state.selectedCategory = null;
         state.selectedServices.clear();
         state.hourlyServices.clear();
+        state.smartEditingServices.clear();
         state.currentView = 'categories';
         
         // Reset UI
@@ -1202,6 +1401,15 @@
         if (state.hourlyServices.size > 0) {
             summary += 'Hourly Services:\n';
             state.hourlyServices.forEach((service, serviceId) => {
+                const total = service.price * service.hours;
+                summary += `${service.name} - ${service.hours} hour(s) - $${total}\n`;
+            });
+            summary += '\n';
+        }
+        
+        if (state.smartEditingServices.size > 0) {
+            summary += 'Smart Editing Services:\n';
+            state.smartEditingServices.forEach((service, serviceId) => {
                 const total = service.price * service.hours;
                 summary += `${service.name} - ${service.hours} hour(s) - $${total}\n`;
             });
