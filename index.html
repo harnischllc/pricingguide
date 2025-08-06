@@ -1519,16 +1519,28 @@
                 <span>$${firstPayment.toFixed(0)}</span>
             `;
             
-            // Add monthly total line
+            // Remove any existing monthly total line and add new one
             const totalBreakdown = document.querySelector('.total-breakdown');
+            const existingMonthlyLine = totalBreakdown.querySelector('.monthly-total-line');
+            if (existingMonthlyLine) {
+                existingMonthlyLine.remove();
+            }
+            
             const monthlyLine = document.createElement('div');
-            monthlyLine.className = 'total-line total-final';
+            monthlyLine.className = 'total-line total-final monthly-total-line';
             monthlyLine.innerHTML = `
                 <span>Monthly Total:</span>
                 <span>$${monthlyTotal}/mo</span>
             `;
             totalBreakdown.appendChild(monthlyLine);
         } else {
+            // Remove any existing monthly total line
+            const totalBreakdown = document.querySelector('.total-breakdown');
+            const existingMonthlyLine = totalBreakdown.querySelector('.monthly-total-line');
+            if (existingMonthlyLine) {
+                existingMonthlyLine.remove();
+            }
+            
             document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal + smartEditingTotal).toFixed(0)}`;
         }
     }
