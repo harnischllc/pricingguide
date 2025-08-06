@@ -505,6 +505,12 @@
                     <h3>Podcast Services</h3>
                     <p>Planning sessions and strategy development</p>
                 </div>
+                
+                <div class="category-card" data-category="consultation">
+                    <i class="fas fa-comments"></i>
+                    <h3>Consultation Services</h3>
+                    <p>Business strategy, branding, and media guidance</p>
+                </div>
             </div>
 
             <!-- Service Options -->
@@ -677,6 +683,33 @@
                             <div class="service-price">$150/hr</div>
                         </div>
                         <div class="service-description">Strategic planning, content development, and growth consulting</div>
+                    </div>
+                </div>
+
+                <!-- Consultation Services -->
+                <div class="service-grid" id="consultation-services" style="display: none;">
+                    <div class="service-item" data-service="free-consultation" data-price="0" data-type="consultation">
+                        <div class="service-header">
+                            <div class="service-name">Free Initial Consultation</div>
+                            <div class="service-price">Complimentary</div>
+                        </div>
+                        <div class="service-description">Let's start with a complimentary call to understand your needs and determine if we're the right fit to work together.</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="monthly-planning" data-price="150" data-type="one-time">
+                        <div class="service-header">
+                            <div class="service-name">Monthly Planning Session</div>
+                            <div class="service-price">$150</div>
+                        </div>
+                        <div class="service-description">1-hour monthly strategy session with content planning and goal setting</div>
+                    </div>
+                    
+                    <div class="service-item" data-service="quarterly-strategy" data-price="500" data-type="one-time">
+                        <div class="service-header">
+                            <div class="service-name">Quarterly Strategy Planning</div>
+                            <div class="service-price">$500</div>
+                        </div>
+                        <div class="service-description">2.5-hour comprehensive quarterly strategy session with detailed planning</div>
                     </div>
                 </div>
 
@@ -1058,6 +1091,18 @@
                 // Handle deliverable selection (RAW vs JPEG)
                 handleDeliverableSelection(serviceId);
                 return; // Don't continue with normal selection logic
+            } else if (type === 'consultation') {
+                // Handle consultation services (redirect to Calendly)
+                if (serviceId === 'free-consultation') {
+                    window.open('https://calendly.com/harnischllc/zoom-meeting', '_blank');
+                    return; // Don't add to state, just redirect
+                } else {
+                    state.selectedServices.set(serviceId, {
+                        name: serviceName,
+                        price: price,
+                        type: type
+                    });
+                }
             } else {
                 state.selectedServices.set(serviceId, {
                     name: serviceName,
