@@ -1313,7 +1313,9 @@
         let smartEditingTotal = 0;
         
         // One-time services
+        console.log('Selected services:', state.selectedServices);
         state.selectedServices.forEach((service, serviceId) => {
+            console.log('Processing service:', serviceId, service);
             if (service.type === 'one-time') {
                 if (serviceId === 'custom-solution') {
                     addBreakdownItem(service.name, 'Contact for pricing');
@@ -1326,6 +1328,7 @@
                 addBreakdownItem(service.name, `$${service.price}/mo`);
             }
         });
+        console.log('Totals after processing:', { oneTimeTotal, monthlyTotal });
         
         // Hourly services
         state.hourlyServices.forEach((service, serviceId) => {
