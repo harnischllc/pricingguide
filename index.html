@@ -193,7 +193,7 @@
         color: var(--gray-700);
     }
 
-    .monthly-addons-header {
+    .bells-whistles-header {
         grid-column: 1 / -1;
         background: var(--gray-50);
         padding: 1rem;
@@ -202,14 +202,14 @@
         margin: 1.5rem 0 1rem 0;
     }
 
-    .monthly-addons-header h3 {
+    .bells-whistles-header h3 {
         margin: 0 0 0.25rem 0;
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--gray-800);
     }
 
-    .monthly-addons-header p {
+    .bells-whistles-header p {
         margin: 0;
         font-size: 0.875rem;
         color: var(--gray-600);
@@ -325,9 +325,10 @@
     }
 
     .input-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        display: flex;
+        flex-wrap: wrap;
         gap: 1rem;
+        align-items: flex-start;
     }
 
     .input-group {
@@ -335,6 +336,8 @@
         padding: 1rem;
         border-radius: var(--radius);
         border: 1px solid var(--gray-200);
+        min-width: 200px;
+        flex: 1;
     }
 
     .input-group label {
@@ -642,10 +645,10 @@
                         <div class="service-description">Custom solution for larger business or organization. <a href="https://calendly.com/harnischllc/zoom-meeting" target="_blank" style="color: var(--primary); text-decoration: underline;">Schedule a time to discuss your vision</a></div>
                     </div>
                     
-                    <!-- Monthly Add-ons Section -->
-                    <div class="monthly-addons-header">
-                        <h3>Monthly Add-ons</h3>
-                        <p>Add ongoing services to your website</p>
+                    <!-- Bells & Whistles Section -->
+                    <div class="bells-whistles-header">
+                        <h3>Bells & Whistles</h3>
+                        <p>Add some extra magic to your website</p>
                     </div>
                     
                     <div class="service-item" data-service="security-monitoring" data-price="200" data-type="monthly">
@@ -1009,6 +1012,20 @@
         
         document.getElementById('selectedCount').textContent = selectedCount;
         document.getElementById('liveTotal').textContent = `$${total.toFixed(0)}`;
+        
+        // Update button text based on custom solution selection
+        updateQuoteButton();
+    }
+
+    function updateQuoteButton() {
+        const quoteButton = document.querySelector('.btn-success');
+        const hasCustomSolution = state.selectedServices.has('custom-solution');
+        
+        if (hasCustomSolution) {
+            quoteButton.innerHTML = '<i class="fas fa-calendar"></i> Schedule Consultation';
+        } else {
+            quoteButton.innerHTML = '<i class="fas fa-envelope"></i> Get Custom Quote';
+        }
     }
 
     function calculateTotal() {
@@ -1036,6 +1053,15 @@
     function getQuote() {
         if (state.selectedServices.size === 0 && state.hourlyServices.size === 0) {
             alert('Please select at least one service to get a quote.');
+            return;
+        }
+        
+        // Check if custom solution is selected
+        const hasCustomSolution = state.selectedServices.has('custom-solution');
+        
+        if (hasCustomSolution) {
+            // Redirect to Calendly for custom solution
+            window.open('https://calendly.com/harnischllc/zoom-meeting', '_blank');
             return;
         }
         
