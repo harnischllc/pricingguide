@@ -577,6 +577,7 @@
 
                 <!-- Photography Services -->
                 <div class="service-grid" id="photography-services" style="display: none;">
+                    <!-- Shooting Services -->
                     <div class="service-item" data-service="photography" data-price="100" data-type="hourly">
                         <div class="service-header">
                             <div class="service-name">Photography</div>
@@ -601,7 +602,8 @@
                         <div class="service-description">Combined photography and videography services for comprehensive coverage</div>
                     </div>
                     
-                    <div class="service-item" data-service="photo-editing" data-price="50" data-type="smart-editing" data-editing-type="photo">
+                    <!-- Editing Services (shown conditionally) -->
+                    <div class="service-item editing-option" data-service="photo-editing" data-price="50" data-type="smart-editing" data-editing-type="photo" style="display: none;">
                         <div class="service-header">
                             <div class="service-name">Photo Editing</div>
                             <div class="service-price">$50/hr (Auto-calculated)</div>
@@ -609,7 +611,7 @@
                         <div class="service-description">Professional photo editing, color correction, and post-production. Hours calculated based on shooting time.</div>
                     </div>
                     
-                    <div class="service-item" data-service="video-editing" data-price="50" data-type="smart-editing" data-editing-type="video">
+                    <div class="service-item editing-option" data-service="video-editing" data-price="50" data-type="smart-editing" data-editing-type="video" style="display: none;">
                         <div class="service-header">
                             <div class="service-name">Video Editing</div>
                             <div class="service-price">$50/hr (Auto-calculated)</div>
@@ -617,7 +619,8 @@
                         <div class="service-description">Professional video editing and post-production. Hours calculated based on shooting time.</div>
                     </div>
                     
-                    <div class="service-item" data-service="raw-files" data-price="0" data-type="deliverable">
+                    <!-- Deliverable Options (shown conditionally) -->
+                    <div class="service-item deliverable-option" data-service="raw-files" data-price="0" data-type="deliverable" style="display: none;">
                         <div class="service-header">
                             <div class="service-name">RAW Files</div>
                             <div class="service-price">Included</div>
@@ -625,12 +628,20 @@
                         <div class="service-description">Unprocessed image files requiring post-processing. Best for professional editing.</div>
                     </div>
                     
-                    <div class="service-item" data-service="jpeg-files" data-price="0" data-type="deliverable">
+                    <div class="service-item deliverable-option" data-service="jpeg-files" data-price="0" data-type="deliverable" style="display: none;">
                         <div class="service-header">
                             <div class="service-name">JPEG Files</div>
                             <div class="service-price">Included</div>
                         </div>
                         <div class="service-description">Processed, ready-to-use images. Perfect for immediate use and sharing.</div>
+                    </div>
+                    
+                    <div class="service-item deliverable-option" data-service="video-files" data-price="0" data-type="deliverable" style="display: none;">
+                        <div class="service-header">
+                            <div class="service-name">Video Files</div>
+                            <div class="service-price">Included</div>
+                        </div>
+                        <div class="service-description">Full video files delivered in professional format.</div>
                     </div>
                 </div>
 
@@ -845,6 +856,9 @@
                 service.hours = state.smartEditingServices.get(serviceId).hours;
             }
         });
+        
+        // Update conditional options display
+        updateConditionalOptions();
     }
 
     function updateSmartEditingUI() {
@@ -856,6 +870,45 @@
                 priceElement.textContent = `$${service.price}/hr (${service.hours} hrs)`;
             }
         });
+    }
+
+    function updateConditionalOptions() {
+        // Check what shooting services are selected
+        const hasPhotography = state.hourlyServices.has('photography');
+        const hasVideography = state.hourlyServices.has('videography');
+        const hasPhotoVideoCombo = state.hourlyServices.has('photo-video-combo');
+        
+        // Show/hide editing options
+        const photoEditingOption = document.querySelector('[data-service="photo-editing"]');
+        const videoEditingOption = document.querySelector('[data-service="video-editing"]');
+        
+        if (photoEditingOption) {
+            photoEditingOption.style.display = (hasPhotography || hasPhotoVideoCombo) ? 'block' : 'none';
+        }
+        
+        if (videoEditingOption) {
+            videoEditingOption.style.display = (hasVideography || hasPhotoVideoCombo) ? 'block' : 'none';
+        }
+        
+        // Show/hide deliverable options
+        const rawFilesOption = document.querySelector('[data-service="raw-files"]');
+        const jpegFilesOption = document.querySelector('[data-service="jpeg-files"]');
+        const videoFilesOption = document.querySelector('[data-service="video-files"]');
+        
+        // Only show deliverable options if shooting is selected but no editing is selected
+        const hasPhotoEditing = state.smartEditingServices.has('photo-editing');
+        const hasVideoEditing = state.smartEditingServices.has('video-editing');
+        
+        if (rawFilesOption && jpegFilesOption) {
+            const showPhotoDeliverables = (hasPhotography || hasPhotoVideoCombo) && !hasPhotoEditing;
+            rawFilesOption.style.display = showPhotoDeliverables ? 'block' : 'none';
+            jpegFilesOption.style.display = showPhotoDeliverables ? 'block' : 'none';
+        }
+        
+        if (videoFilesOption) {
+            const showVideoDeliverables = (hasVideography || hasPhotoVideoCombo) && !hasVideoEditing;
+            videoFilesOption.style.display = showVideoDeliverables ? 'block' : 'none';
+        }
     }
 
     function handleDeliverableSelection(selectedDeliverable) {
@@ -1000,6 +1053,9 @@
             }
         }
         
+        // Update conditional options when services are selected/deselected
+        updateConditionalOptions();
+        
         updateLiveSummary();
     }
 
@@ -1059,6 +1115,9 @@
         
         // Update smart editing estimates when shooting/recording hours change
         updateSmartEditingEstimates();
+        
+        // Update conditional options display
+        updateConditionalOptions();
         
         updateLiveSummary();
     }
