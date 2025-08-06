@@ -193,6 +193,28 @@
         color: var(--gray-700);
     }
 
+    .monthly-addons-header {
+        grid-column: 1 / -1;
+        background: var(--gray-50);
+        padding: 1rem;
+        border-radius: var(--radius);
+        border-left: 4px solid var(--primary);
+        margin: 1.5rem 0 1rem 0;
+    }
+
+    .monthly-addons-header h3 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .monthly-addons-header p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+    }
+
     .service-item {
         background: white;
         border: 2px solid var(--gray-200);
@@ -217,9 +239,9 @@
     .service-item.selected::after {
         content: '✓';
         position: absolute;
-        top: 0.75rem;
+        bottom: 0.75rem;
         right: 0.75rem;
-        background: var(--primary);
+        background: #10b981;
         color: white;
         width: 1.5rem;
         height: 1.5rem;
@@ -233,20 +255,23 @@
 
     /* Website options (mutually exclusive) */
     .service-item[data-service="full-website"],
-    .service-item[data-service="landing-page"] {
+    .service-item[data-service="landing-page"],
+    .service-item[data-service="custom-solution"] {
         border-width: 3px;
         border-style: solid;
     }
 
     .service-item[data-service="full-website"]:hover,
-    .service-item[data-service="landing-page"]:hover {
+    .service-item[data-service="landing-page"]:hover,
+    .service-item[data-service="custom-solution"]:hover {
         border-color: var(--primary-dark);
         transform: translateY(-2px);
         box-shadow: var(--shadow-lg);
     }
 
     .service-item[data-service="full-website"].selected,
-    .service-item[data-service="landing-page"].selected {
+    .service-item[data-service="landing-page"].selected,
+    .service-item[data-service="custom-solution"].selected {
         border-color: var(--primary);
         background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
         box-shadow: var(--shadow-md);
@@ -585,20 +610,14 @@
                     <p>Planning sessions and strategy development</p>
                 </div>
                 
-                <div class="category-card" data-category="monthly">
-                    <i class="fas fa-sync-alt"></i>
-                    <h3>Monthly Services</h3>
-                    <p>Ongoing maintenance and monitoring</p>
-                </div>
+
             </div>
 
             <!-- Service Options -->
             <div class="service-options" id="serviceOptions">
                 <!-- Website Services -->
                 <div class="service-grid" id="website-services" style="display: none;">
-                    <div class="service-selection-note">
-                        <p><strong>Choose one website option:</strong></p>
-                    </div>
+                    <!-- Main Website Options -->
                     <div class="service-item" data-service="full-website" data-price="5000" data-type="one-time">
                         <div class="service-header">
                             <div class="service-name">Full Custom Website</div>
@@ -614,7 +633,21 @@
                         </div>
                         <div class="service-description">High-converting landing page with custom design and optimization</div>
                     </div>
-                    <!-- Monthly Services (moved under Website Services) -->
+                    
+                    <div class="service-item" data-service="custom-solution" data-price="0" data-type="one-time">
+                        <div class="service-header">
+                            <div class="service-name">Custom Solution</div>
+                            <div class="service-price">Contact Us</div>
+                        </div>
+                        <div class="service-description">Custom solution for larger business or organization. <a href="https://calendly.com/harnischllc/zoom-meeting" target="_blank" style="color: var(--primary); text-decoration: underline;">Schedule a time to discuss your vision</a></div>
+                    </div>
+                    
+                    <!-- Monthly Add-ons Section -->
+                    <div class="monthly-addons-header">
+                        <h3>Monthly Add-ons</h3>
+                        <p>Add ongoing services to your website</p>
+                    </div>
+                    
                     <div class="service-item" data-service="security-monitoring" data-price="200" data-type="monthly">
                         <div class="service-header">
                             <div class="service-name">Security Monitoring & Backups</div>
@@ -871,9 +904,9 @@
         const type = item.dataset.type;
         
         // Handle website services (mutually exclusive)
-        if (type === 'one-time' && (serviceId === 'full-website' || serviceId === 'landing-page')) {
+        if (type === 'one-time' && (serviceId === 'full-website' || serviceId === 'landing-page' || serviceId === 'custom-solution')) {
             // Deselect other website options first
-            const websiteServices = document.querySelectorAll('[data-service="full-website"], [data-service="landing-page"]');
+            const websiteServices = document.querySelectorAll('[data-service="full-website"], [data-service="landing-page"], [data-service="custom-solution"]');
             websiteServices.forEach(service => {
                 if (service !== item) {
                     service.classList.remove('selected');
@@ -986,6 +1019,8 @@
         state.selectedServices.forEach((service, serviceId) => {
             if (service.type === 'monthly') {
                 monthlyTotal += service.price;
+            } else if (serviceId === 'custom-solution') {
+                // Custom solution doesn't add to total
             } else {
                 oneTimeTotal += service.price;
             }
@@ -1027,8 +1062,12 @@
         // One-time services
         state.selectedServices.forEach((service, serviceId) => {
             if (service.type === 'one-time') {
-                oneTimeTotal += service.price;
-                addBreakdownItem(service.name, `$${service.price}`);
+                if (serviceId === 'custom-solution') {
+                    addBreakdownItem(service.name, 'Contact for pricing');
+                } else {
+                    oneTimeTotal += service.price;
+                    addBreakdownItem(service.name, `$${service.price}`);
+                }
             } else if (service.type === 'monthly') {
                 monthlyTotal += service.price;
                 addBreakdownItem(service.name, `$${service.price}/mo`);
@@ -1107,6 +1146,8 @@
         state.selectedServices.forEach((service, serviceId) => {
             if (service.type === 'monthly') {
                 monthlyServices.push(`${service.name} - $${service.price}/mo`);
+            } else if (serviceId === 'custom-solution') {
+                oneTimeServices.push(`${service.name} - Contact for pricing`);
             } else {
                 oneTimeServices.push(`${service.name} - $${service.price}`);
             }
