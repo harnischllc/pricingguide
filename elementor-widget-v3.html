@@ -432,6 +432,14 @@
     color: #5d4fff;
 }
 
+.pricing-calculator .estimate-note {
+    margin: 1rem 0 0 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -770,6 +778,7 @@
                         <span id="finalTotal">$0</span>
                     </div>
                 </div>
+                <p class="estimate-note">* All estimates are for 1 year of service</p>
 
                 <div class="actions">
                     <button class="btn btn-secondary" onclick="backToServices()">
@@ -1361,25 +1370,26 @@
         const hasMonthlyServices = monthlyTotal > 0;
         
         if (hasWebsiteServices && hasMonthlyServices) {
-            // Show initial build and yearly maintenance
+            // Show first payment (build + 1 month) and monthly total
             const websitePrice = state.selectedServices.get('full-website')?.price || state.selectedServices.get('landing-page')?.price || 0;
+            const firstPayment = websitePrice + monthlyTotal;
             
             // Update the final total display
             const finalTotalElement = document.getElementById('finalTotal');
             finalTotalElement.parentElement.innerHTML = `
-                <span>Initial Build:</span>
-                <span>$${websitePrice.toFixed(0)}</span>
+                <span>First Payment:</span>
+                <span>$${firstPayment.toFixed(0)}</span>
             `;
             
-            // Add yearly maintenance line
+            // Add monthly total line
             const totalBreakdown = document.querySelector('.total-breakdown');
-            const yearlyLine = document.createElement('div');
-            yearlyLine.className = 'total-line total-final';
-            yearlyLine.innerHTML = `
-                <span>Year of Maintenance:</span>
+            const monthlyLine = document.createElement('div');
+            monthlyLine.className = 'total-line total-final';
+            monthlyLine.innerHTML = `
+                <span>Monthly Total:</span>
                 <span>$${monthlyTotal}/mo</span>
             `;
-            totalBreakdown.appendChild(yearlyLine);
+            totalBreakdown.appendChild(monthlyLine);
         } else {
             document.getElementById('finalTotal').textContent = `$${(oneTimeTotal + hourlyTotal + monthlyTotal + smartEditingTotal).toFixed(0)}`;
         }
