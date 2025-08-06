@@ -1151,6 +1151,20 @@
             });
         }
         
+        // Handle shooting services (mutually exclusive)
+        if (type === 'hourly' && (serviceId === 'photography' || serviceId === 'videography' || serviceId === 'photo-video-combo')) {
+            // Deselect other shooting options first
+            const shootingServices = document.querySelectorAll('[data-service="photography"], [data-service="videography"], [data-service="photo-video-combo"]');
+            shootingServices.forEach(service => {
+                if (service !== item) {
+                    service.classList.remove('selected');
+                    const otherServiceId = service.dataset.service;
+                    state.hourlyServices.delete(otherServiceId);
+                    removeHourlyInput(otherServiceId);
+                }
+            });
+        }
+        
         if (item.classList.contains('selected')) {
             // Deselect
             item.classList.remove('selected');
